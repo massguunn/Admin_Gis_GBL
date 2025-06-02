@@ -1,0 +1,17 @@
+# Abaikan folder node_modules
+node_modules/
+
+# Abaikan file konfigurasi lokal
+.env
+*.env
+
+# Abaikan log file
+*.log
+
+# Abaikan file build/hasil kompilasi
+/dist
+/build
+
+# Abaikan sistem editor (VSCode, macOS, dll)
+.DS_Store
+.vscode/
