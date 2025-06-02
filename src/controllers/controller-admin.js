@@ -8,7 +8,7 @@ module.exports = {
   showDashboard(req, res) {
     console.log("showDashboard jalan");
     res.render("admin", {
-      url: "http://localhost:5050/",
+      url: "http://localhost:3000/",
     });
   },
 

@@ -55,6 +55,6 @@ app.use((req, res, next) => {
 });
 
 // Jalankan server
-app.listen(5050, () => {
-  console.log("Server Berjalan di Port : " + 5050);
+app.listen(3000, () => {
+  console.log("Server Berjalan di Port : " + 3000);
 });

@@ -18,7 +18,7 @@ module.exports = {
       const totalGB = results[0].totalGB;
 
       res.render("home", {
-        url: "http://localhost:5050/",
+        url: "http://localhost:3000/",
         userName: req.session.username,
         totalGB: totalGB,
       });

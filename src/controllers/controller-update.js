@@ -10,7 +10,7 @@ pool.on("error", (err) => {
 module.exports = {
   formUpdate(req, res) {
     res.render("admin", {
-      url: "http://localhost:5050/",
+      url: "http://localhost:3000/",
     });
   },
 

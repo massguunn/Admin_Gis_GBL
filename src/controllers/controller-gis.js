@@ -17,7 +17,7 @@ module.exports = {
 
       res.render("gis", {
         data: results, // ⬅️ Ini penting!
-        url: "http://localhost:5050/",
+        url: "http://localhost:3000/",
       });
     });
   },

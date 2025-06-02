@@ -15,7 +15,7 @@ module.exports = {
   formRegister(req, res) {
     res.render("register", {
       // Definisikan semua varibel yang ingin ikut dirender kedalam register.ejs
-      url: "http://localhost:5050/",
+      url: "http://localhost:3000/",
     });
   },
   // Fungsi untuk menyimpan data
