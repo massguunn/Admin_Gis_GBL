@@ -9,11 +9,22 @@ pool.on("error", (err) => {
 
 module.exports = {
   // Render tampilan untuk login yang ada didalam folder 'src/views/login.ejs'
+  // login(req, res) {
+  //   res.render("login", {
+  //     // url: "http://localhost:3000/", pake lokal
+  //     url: fullUrl, //pake untuk online
+  //     // Kirim juga library flash yang telah di set
+  //     colorFlash: req.flash("color"),
+  //     statusFlash: req.flash("status"),
+  //     pesanFlash: req.flash("message"),
+  //   });
+  // },
+
   login(req, res) {
+    const fullUrl = req.protocol + "://" + req.get("host") + "/";
+
     res.render("login", {
-      // url: "http://localhost:3000/", pake lokal
-      url: fullUrl, //pake untuk online
-      // Kirim juga library flash yang telah di set
+      url: fullUrl, // sekarang sudah didefinisikan
       colorFlash: req.flash("color"),
       statusFlash: req.flash("status"),
       pesanFlash: req.flash("message"),
