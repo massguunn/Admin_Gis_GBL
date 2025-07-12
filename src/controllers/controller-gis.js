@@ -1,4 +1,3 @@
-const { gis } = require(".");
 const config = require("../configs/database");
 const mysql = require("mysql");
 const pool = mysql.createPool(config);
@@ -15,9 +14,14 @@ module.exports = {
         return res.status(500).send("Gagal ambil data dari database");
       }
 
+      //saat online
+      // Gunakan host & protocol yang dinamis agar tidak terikat ke localhost
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
+
       res.render("gis", {
         data: results, // ⬅️ Ini penting!
-        url: "http://localhost:3000/",
+        // url: "http://localhost:3000/", gunakan saat lokal
+        url: fullUrl,
       });
     });
   },
