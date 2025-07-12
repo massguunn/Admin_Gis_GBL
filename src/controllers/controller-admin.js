@@ -42,6 +42,15 @@ module.exports = {
       latitude,
       longitude,
       map,
+      jm_gendang,
+      jm_suling,
+      jm_cemprang,
+      jm_reong,
+      jm_gong,
+      jm_petuq,
+      jm_rencek,
+      link_fb,
+      link_ig,
     } = req.body;
     let gambar = null;
     if (req.file) {
@@ -54,8 +63,8 @@ module.exports = {
     }
 
     const sql = `
-      INSERT INTO data_GB (nama_gb, alamat_gb, nomer_hp, harga, deskripsi, gambar, latitude, longitude, map)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO data_GB (nama_gb, alamat_gb, nomer_hp, harga, deskripsi, gambar, latitude, longitude, map, jm_gendang, jm_suling, jm_cemprang, jm_reong, jm_gong, jm_petuq, jm_rencek, link_fb, link_ig)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const values = [
       nama_gb,
@@ -67,6 +76,15 @@ module.exports = {
       latitude,
       longitude,
       map,
+      jm_gendang,
+      jm_suling,
+      jm_cemprang,
+      jm_reong,
+      jm_gong,
+      jm_petuq,
+      jm_rencek,
+      link_fb,
+      link_ig,
     ];
 
     pool.query(sql, values, (err, result) => {
@@ -93,6 +111,15 @@ module.exports = {
       latitude,
       longitude,
       map,
+      jm_gendang,
+      jm_suling,
+      jm_cemprang,
+      jm_reong,
+      jm_gong,
+      jm_petuq,
+      jm_rencek,
+      link_fb,
+      link_ig,
     } = req.body;
 
     let sql = "";
@@ -102,7 +129,7 @@ module.exports = {
       // Ada file baru, update semua termasuk gambar
       const gambar = "/uploads/" + req.file.filename;
       sql = `
-      UPDATE data_GB SET nama_gb=?, alamat_gb=?, nomer_hp=?, harga=?, deskripsi=?, gambar=?, latitude=?, longitude=?, map=?
+      UPDATE data_GB SET nama_gb=?, alamat_gb=?, nomer_hp=?, harga=?, deskripsi=?, gambar=?, latitude=?, longitude=?, map=?, jm_gendang=?, jm_suling=?, jm_cemprang=?, jm_reong=?, jm_gong=?, jm_petuq=?, jm_rencek=?, link_fb=?, link_ig=?
       WHERE id=?
     `;
       values = [
@@ -115,12 +142,21 @@ module.exports = {
         latitude,
         longitude,
         map,
+        jm_gendang,
+        jm_suling,
+        jm_cemprang,
+        jm_reong,
+        jm_gong,
+        jm_petuq,
+        jm_rencek,
+        link_fb,
+        link_ig,
         id,
       ];
     } else {
       // Tidak ada file baru, jangan update kolom gambar
       sql = `
-      UPDATE data_GB SET nama_gb=?, alamat_gb=?, nomer_hp=?, harga=?, deskripsi=?, latitude=?, longitude=?, map=?
+      UPDATE data_GB SET nama_gb=?, alamat_gb=?, nomer_hp=?, harga=?, deskripsi=?, latitude=?, longitude=?, map=?, jm_gendang=?, jm_suling=?, jm_cemprang=?, jm_reong=?, jm_gong=?, jm_petuq=?, jm_rencek=?, link_fb=?, link_ig=?
       WHERE id=?
     `;
       values = [
@@ -132,6 +168,15 @@ module.exports = {
         latitude,
         longitude,
         map,
+        jm_gendang,
+        jm_suling,
+        jm_cemprang,
+        jm_reong,
+        jm_gong,
+        jm_petuq,
+        jm_rencek,
+        link_fb,
+        link_ig,
         id,
       ];
     }

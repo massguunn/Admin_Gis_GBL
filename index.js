@@ -15,6 +15,7 @@ const loginRoutes = require("./src/routes/router-login");
 const registerRoutes = require("./src/routes/router-register");
 const appRoutes = require("./src/routes/router-app");
 const adminRoutes = require("./src/routes/router-admin");
+const alatMusikRoutes = require("./src/routes/router-alatMusik");
 
 // Configurasi dan gunakan library
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -33,7 +34,7 @@ app.use(
     name: "secretName",
     cookie: {
       sameSite: true,
-      maxAge: 60000,
+      maxAge: 600000,
     },
   })
 );
@@ -49,6 +50,7 @@ app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);
 app.use("/", appRoutes);
 app.use("/", adminRoutes);
+app.use("/alatMusik", alatMusikRoutes);
 app.use((req, res, next) => {
   res.locals.url = req.protocol + "://" + req.get("host");
   next();

@@ -211,7 +211,7 @@
         <div class="mb-3">
           <label for="harga" class="form-label">Harga Sewa</label>
           <input
-            type="number"
+            type="float"
             class="form-control"
             id="harga"
             name="harga"
@@ -266,9 +266,89 @@
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="map" class="form-label">Link Google Maps</label>
-          <input type="text" class="form-control" id="map" name="map" />
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="jm_gendang" class="form-label">Jumlah Gendang</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_gendang"
+              name="jm_gendang"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="jm_suling" class="form-label">Jumlah Suling</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_suling"
+              name="jm_suling"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="jm_cemprang" class="form-label">Jumlah Cemprang</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_cemprang"
+              name="jm_cemprang"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="jm_reong" class="form-label">Jumlah Reong</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_reong"
+              name="jm_reong"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="jm_gong" class="form-label">Jumlah Gong</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_gong"
+              name="jm_gong"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="jm_petuq" class="form-label">Jumlah Petuq</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_petuq"
+              name="jm_petuq"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="jm_rencek" class="form-label">Jumlah Rencek</label>
+            <input
+              type="number"
+              class="form-control"
+              id="jm_rencek"
+              name="jm_rencek"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="map" class="form-label">Link Google Maps</label>
+            <input type="text" class="form-control" id="map" name="map" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="link_ig" class="form-label">Link Instagram</label>
+            <input type="text" class="form-control" id="link_ig" name="link_ig" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="link_fb" class="form-label">Link Facebook</label>
+            <input type="text" class="form-control" id="link_fb" name="link_fb" />
+          </div>
         </div>
 
         <button type="submit" class="btn btn-primary w-100 text-center">
@@ -288,28 +368,47 @@
             <th>No. HP</th>
             <th>Harga</th>
             <th>Deskripsi</th>
+            <th>Gendang</th>
+            <th>Suling</th>
+            <th>Cemprang</th>
+            <th>Reong</th>
+            <th>Gong</th>
+            <th>Petuq</th>
+            <th>Rencek</th>
             <th>Gambar</th>
             <th>Latitude</th>
             <th>Longitude</th>
             <th>Link Map</th>
+            <th>Link fb</th>
+            <th>link ig</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
           <% if (data && data.length > 0) { %> <% data.forEach(item => { %>
           <tr>
-            <!-- <td><%= item.id %></td> -->
             <td><%= item.nama_gb %></td>
             <td><%= item.alamat_gb %></td>
             <td><%= item.nomer_hp %></td>
             <td>Rp.<%= item.harga %></td>
             <td><%= item.deskripsi %></td>
+
+            <td><%= item.jm_gendang %></td>
+            <td><%= item.jm_suling %></td>
+            <td><%= item.jm_cemprang %></td>
+            <td><%= item.jm_reong %></td>
+            <td><%= item.jm_gong %></td>
+            <td><%= item.jm_petuq %></td>
+            <td><%= item.jm_rencek %></td>
+
             <td>
               <img src="<%= item.gambar %>" alt="gambar" width="80" />
             </td>
             <td><%= item.latitude %></td>
             <td><%= item.longitude %></td>
             <td><a href="<%= item.map %>" target="_blank">Link Map</a></td>
+            <td><%= item.link_fb %></td>
+            <td><%= item.link_ig %></td>
             <td>
               <button
                 class="btn btn-warning btn-sm"
@@ -327,14 +426,13 @@
           </tr>
           <% }) %> <% } else { %>
           <tr>
-            <td colspan="11" class="text-center">Data kosong</td>
+            <td colspan="17" class="text-center">Data kosong</td>
           </tr>
           <% } %>
         </tbody>
       </table>
     </div>
 
-    <!-- Modal Edit Data -->
     <!-- Modal Edit Data -->
     <div
       class="modal fade"
@@ -393,7 +491,7 @@
               <div class="mb-3">
                 <label for="edit-harga" class="form-label">Harga</label>
                 <input
-                  type="number"
+                  type="float"
                   class="form-control"
                   id="edit-harga"
                   name="harga"
@@ -435,7 +533,124 @@
                   name="longitude"
                 />
               </div>
-              <div class="mb-3">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="edit-gendang" class="form-label"
+                    >Jumlah Gendang</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-gendang"
+                    name="jm_gendang"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-suling" class="form-label"
+                    >Jumlah Suling</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-suling"
+                    name="jm_suling"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-cemprang" class="form-label"
+                    >Jumlah Cemprang</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-cemprang"
+                    name="jm_cemprang"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-reong" class="form-label"
+                    >Jumlah Reong</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-reong"
+                    name="jm_reong"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-gong" class="form-label">Jumlah Gong</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-gong"
+                    name="jm_gong"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-petuq" class="form-label"
+                    >Jumlah Petuq</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-petuq"
+                    name="jm_petuq"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-rencek" class="form-label"
+                    >Jumlah Rencek</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit-rencek"
+                    name="jm_rencek"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-map" class="form-label"
+                    >Link Google Maps</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-map"
+                    name="map"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-fb" class="form-label"
+                    >Link Facebook</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-fb"
+                    name="link_fb"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-ig" class="form-label"
+                    >Link Instagram</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-ig"
+                    name="link_ig"
+                  />
+                </div>
+              </div>
+              <!-- <div class="mb-3">
                 <label for="edit-map" class="form-label">Link Map</label>
                 <input
                   type="text"
@@ -443,7 +658,7 @@
                   id="edit-map"
                   name="map"
                 />
-              </div>
+              </div> -->
             </div>
             <div class="modal-footer">
               <button

@@ -4,6 +4,7 @@ const home = require("./controller-home");
 const profile = require("./controller-profile");
 const showDashboard = require("./controller-admin");
 const gis = require("./controller-gis");
+const alatMusik = require("./controller-alatMusik");
 
 module.exports = {
   login,
@@ -12,4 +13,5 @@ module.exports = {
   profile,
   showDashboard,
   gis,
+  alatMusik,
 };
