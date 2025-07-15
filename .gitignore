@@ -15,3 +15,4 @@ node_modules/
 # Abaikan sistem editor (VSCode, macOS, dll)
 .DS_Store
 .vscode/
+public/peralatan/
