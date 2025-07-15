@@ -22,6 +22,7 @@ module.exports = {
 
     let gambar = null;
     let suara = null;
+    let video = null;
 
     if (req.files && req.files.gambar && req.files.gambar.length > 0) {
       gambar = "/peralatan/" + req.files.gambar[0].filename;
@@ -32,17 +33,20 @@ module.exports = {
     if (req.files && req.files.video && req.files.video.length > 0) {
       video = "/peralatan/" + req.files.video[0].filename;
     }
-    
 
     const query =
       "INSERT INTO alat_musik (nama, deskripsi, gambar, suara, video) VALUES(?,?,?,?,?)";
-    pool.query(query, [nama, deskripsi, gambar, suara, video], (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Gagal menyimpan data.");
+    pool.query(
+      query,
+      [nama, deskripsi, gambar, suara, video],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Gagal menyimpan data.");
+        }
+        res.redirect("/alatMusik");
       }
-      res.redirect("/alatMusik");
-    });
+    );
   },
 
   updateData(req, res) {
