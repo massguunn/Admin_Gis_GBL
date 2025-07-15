@@ -22,9 +22,10 @@ module.exports = {
           const fullUrl = req.protocol + "://" + req.get("host") + "/";
 
           res.render("profile", {
+            url: fullUrl,
             userName: req.session.username,
-            nama: results[0]["user_name"],
-            email: results[0]["user_email"],
+            nama: results[0].user_name,
+            email: results[0].user_email,
             fotoProfil: "/images/jaga.jpeg",
           });
         }
