@@ -15,7 +15,7 @@ module.exports = {
 
   // untukk ambil data
   showDashboard(req, res) {
-    const query = "SELECT * FROM data_GB"; // Sesuaikan dengan nama tabel kamu
+    const query = "SELECT * FROM data_GB";
 
     pool.query(query, (err, results) => {
       if (err) {
@@ -25,7 +25,7 @@ module.exports = {
 
       // ⬅️ Kirim data ke EJS
       res.render("admin", {
-        data: results, // ⬅️ Penting! agar EJS bisa akses `data`
+        data: results, //
       });
     });
   },

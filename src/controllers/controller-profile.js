@@ -18,8 +18,10 @@ module.exports = {
                 `,
         function (error, results) {
           if (error) throw error;
+
+          const fullUrl = req.protocol + "://" + req.get("host") + "/";
+
           res.render("profile", {
-            url: "http://localhost:3000/",
             userName: req.session.username,
             nama: results[0]["user_name"],
             email: results[0]["user_email"],
