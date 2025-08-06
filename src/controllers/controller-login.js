@@ -25,18 +25,26 @@ module.exports = {
 
     if (email && password) {
       pool.getConnection((err, connection) => {
-        if (err) throw err;
+        if (err) {
+          console.error("DB connection error:", err);
+          req.flash("color", "danger");
+          req.flash("status", "Error");
+          req.flash("message", "Database tidak dapat diakses");
+          return res.redirect("/login");
+        }
 
-        // Langkah 1: cek apakah email terdaftar
         const emailCheckQuery = `SELECT * FROM table_user WHERE email = ?`;
         connection.query(emailCheckQuery, [email], (err, results) => {
           if (err) {
             connection.release();
-            throw err;
+            console.error("Query error:", err);
+            req.flash("color", "danger");
+            req.flash("status", "Error");
+            req.flash("message", "Gagal mengambil data");
+            return res.redirect("/login");
           }
 
           if (results.length === 0) {
-            // Email tidak terdaftar
             connection.release();
             req.flash("color", "danger");
             req.flash("status", "Gagal");
@@ -44,7 +52,6 @@ module.exports = {
             return res.redirect("/login");
           }
 
-          // Langkah 2: cek apakah password cocok
           const passwordCheckQuery = `SELECT * FROM table_user WHERE email = ? AND password = SHA2(?, 512)`;
           connection.query(
             passwordCheckQuery,
@@ -52,16 +59,20 @@ module.exports = {
             (err2, result2) => {
               connection.release();
 
-              if (err2) throw err2;
+              if (err2) {
+                console.error("Password check error:", err2);
+                req.flash("color", "danger");
+                req.flash("status", "Error");
+                req.flash("message", "Terjadi kesalahan saat verifikasi");
+                return res.redirect("/login");
+              }
 
               if (result2.length > 0) {
-                // Login sukses
                 req.session.loggedin = true;
                 req.session.userid = result2[0].id;
                 req.session.username = result2[0].name;
                 res.redirect("/");
               } else {
-                // Password salah
                 req.flash("color", "danger");
                 req.flash("status", "Gagal");
                 req.flash("message", "Password salah");
