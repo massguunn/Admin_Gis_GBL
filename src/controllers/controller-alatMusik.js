@@ -19,6 +19,8 @@ module.exports = {
         colorFlash: req.flash("color"),
         statusFlash: req.flash("status"),
         pesanFlash: req.flash("message"),
+        swalMessage: req.flash("swal_message"),
+        swalIcon: req.flash("swal_icon"),
       });
     });
   },
@@ -48,15 +50,13 @@ module.exports = {
       (err, result) => {
         if (err) {
           console.error(err);
-          req.flash("color", "danger");
-          req.flash("status", "Gagal");
-          req.flash("message", "Gagal menyimpan data.");
+          req.flash("swal_message", "Gagal menyimpan data.");
+          req.flash("swal_icon", "error");
           return res.redirect("/alatMusik");
         }
 
-        req.flash("color", "success");
-        req.flash("status", "Berhasil");
-        req.flash("message", "Data berhasil ditambahkan.");
+        req.flash("swal_message", "Data berhasil ditambahkan.");
+        req.flash("swal_icon", "success");
         res.redirect("/alatMusik");
       }
     );
@@ -88,15 +88,13 @@ module.exports = {
       (err, result) => {
         if (err) {
           console.error(err);
-          req.flash("color", "danger");
-          req.flash("status", "Gagal");
-          req.flash("message", "Gagal menyimpan perubahan.");
+          req.flash("swal_message", "Gagal menyimpan perubahan.");
+          req.flash("swal_icon", "error");
           return res.redirect("/alatMusik");
         }
 
-        req.flash("color", "info");
-        req.flash("status", "Berhasil");
-        req.flash("message", "Data berhasil diperbarui.");
+        req.flash("swal_message", "Data berhasil diperbarui.");
+        req.flash("swal_icon", "info");
         res.redirect("/alatMusik");
       }
     );
@@ -109,15 +107,13 @@ module.exports = {
     pool.query(query, [id], (err, result) => {
       if (err) {
         console.error(err);
-        req.flash("color", "danger");
-        req.flash("status", "Gagal");
-        req.flash("message", "Gagal menghapus data.");
+        req.flash("swal_message", "Gagal menghapus data.");
+        req.flash("swal_icon", "error");
         return res.redirect("/alatMusik");
       }
 
-      req.flash("color", "warning");
-      req.flash("status", "Berhasil");
-      req.flash("message", "Data berhasil dihapus.");
+      req.flash("swal_message", "Data berhasil dihapus.");
+      req.flash("swal_icon", "warning");
       res.redirect("/alatMusik");
     });
   },

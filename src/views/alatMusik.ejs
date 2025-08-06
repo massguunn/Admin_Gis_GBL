@@ -401,19 +401,21 @@
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </div>
 
-    <% if (colorFlash && pesanFlash && statusFlash) { %>
-    <div
-      class="alert alert-<%= colorFlash %> alert-dismissible fade show"
-      role="alert"
-    >
-      <strong><%= statusFlash %>:</strong> <%= pesanFlash %>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
-    </div>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <% if (swalMessage.length > 0 && swalIcon.length > 0) { %>
+    <script>
+      Swal.fire({
+        icon: "<%= swalIcon[0] %>", // success | info | warning | error
+        title: "<%= swalMessage[0] %>",
+        toast: true,
+        position: "top",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+    </script>
     <% } %>
   </body>
 </html>
