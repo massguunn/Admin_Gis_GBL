@@ -31,8 +31,11 @@ module.exports = {
         const emailCheckQuery = `SELECT * FROM table_admin WHERE email = ?`;
         connection.query(emailCheckQuery, [email], (err, results) => {
           if (err) {
-            connection.release();
-            throw err;
+            console.error("Database error saat koneksi:", err);
+            req.flash("color", "danger");
+            req.flash("status", "Error");
+            req.flash("message", "Terjadi kesalahan pada server.");
+            return res.redirect("/login");
           }
 
           if (results.length === 0) {
