@@ -39,7 +39,7 @@ module.exports = {
         return res.redirect("/login");
       }
 
-      const query = `SELECT * FROM table_admin WHERE user_email = ?`;
+      const query = `SELECT * FROM table_user WHERE user_email = ?`;
       connection.query(query, [email], (err, results) => {
         if (err) {
           connection.release();
@@ -60,7 +60,7 @@ module.exports = {
 
         const user = results[0];
 
-        const passwordQuery = `SELECT * FROM table_admin WHERE user_email = ? AND user_password = SHA2(?, 512)`;
+        const passwordQuery = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
         connection.query(passwordQuery, [email, password], (err2, result2) => {
           connection.release();
 
