@@ -1,36 +1,63 @@
 const config = require("../configs/database");
-
-let mysql = require("mysql");
-let pool = mysql.createPool(config);
+const mysql = require("mysql");
+const pool = mysql.createPool(config);
 
 pool.on("error", (err) => {
-  console.error(err);
+  console.error("MySQL pool error:", err);
 });
 
 module.exports = {
   profile(req, res) {
-    let id = req.session.userid;
-    pool.getConnection(function (err, connection) {
-      if (err) throw err;
-      connection.query(
-        `
-                SELECT * FROM table_user where user_id = '${id}';
-                `,
-        function (error, results) {
-          if (error) throw error;
+    const id = req.session.userid;
 
-          const fullUrl = req.protocol + "://" + req.get("host") + "/";
+    if (!id) {
+      // Jika user belum login
+      req.flash("color", "danger");
+      req.flash("status", "Gagal");
+      req.flash("message", "Silakan login terlebih dahulu");
+      return res.redirect("/login");
+    }
 
-          res.render("profile", {
-            url: fullUrl,
-            userName: req.session.username,
-            nama: results[0].user_name,
-            email: results[0].user_email,
-            fotoProfil: "/images/jaga.jpeg",
-          });
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.error("Database connection failed:", err);
+        req.flash("color", "danger");
+        req.flash("status", "Error");
+        req.flash("message", "Koneksi ke database gagal");
+        return res.redirect("/login");
+      }
+
+      const sql = `SELECT * FROM table_user WHERE user_id = ?`;
+      connection.query(sql, [id], (error, results) => {
+        connection.release(); // Aman: pastikan dilepas setelah query selesai
+
+        if (error) {
+          console.error("Query error:", error);
+          req.flash("color", "danger");
+          req.flash("status", "Error");
+          req.flash("message", "Gagal mengambil data user");
+          return res.redirect("/login");
         }
-      );
-      connection.release();
+
+        if (results.length === 0) {
+          // Jika user tidak ditemukan
+          req.flash("color", "warning");
+          req.flash("status", "Oops");
+          req.flash("message", "Data user tidak ditemukan");
+          return res.redirect("/login");
+        }
+
+        const user = results[0];
+        const fullUrl = req.protocol + "://" + req.get("host") + "/";
+
+        res.render("profile", {
+          url: fullUrl,
+          userName: user.user_name,
+          nama: user.user_name,
+          email: user.user_email,
+          fotoProfil: user.user_photo || "/images/jaga.jpeg", // fallback
+        });
+      });
     });
   },
 };
