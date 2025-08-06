@@ -1,80 +1,89 @@
+require("dotenv").config();
 const config = require("../configs/database");
+
 const mysql = require("mysql");
 const pool = mysql.createPool(config);
 
-pool.on("error", (err) => {
-  console.error("Database error:", err);
-});
+pool.on("error", (err) => console.error(err));
 
 module.exports = {
-  // GET /login
   login(req, res) {
-    const fullUrl = req.protocol + "://" + req.get("host") + "/";
+    const baseUrl =
+      process.env.BASE_URL || req.protocol + "://" + req.get("host") + "/";
 
     res.render("login", {
-      url: fullUrl,
-      colorFlash: req.flash("color") || null,
-      statusFlash: req.flash("status") || null,
-      pesanFlash: req.flash("message") || null,
+      url: baseUrl, // dari .env
+      colorFlash: req.flash("color"),
+      statusFlash: req.flash("status"),
+      pesanFlash: req.flash("message"),
     });
   },
 
-  // POST /login
   loginAuth(req, res) {
-    const { email, pass } = req.body;
+    const email = req.body.email;
+    const password = req.body.pass;
 
-    if (!email || !pass) {
+    if (email && password) {
+      pool.getConnection((err, connection) => {
+        if (err) throw err;
+
+        // Langkah 1: cek apakah email terdaftar
+        const emailCheckQuery = `SELECT * FROM table_admin WHERE email = ?`;
+        connection.query(emailCheckQuery, [email], (err, results) => {
+          if (err) {
+            connection.release();
+            throw err;
+          }
+
+          if (results.length === 0) {
+            // Email tidak terdaftar
+            connection.release();
+            req.flash("color", "danger");
+            req.flash("status", "Gagal");
+            req.flash("message", "Email tidak terdaftar");
+            return res.redirect("/login");
+          }
+
+          // Langkah 2: cek apakah password cocok
+          const passwordCheckQuery = `SELECT * FROM table_admin WHERE email = ? AND password = SHA2(?, 512)`;
+          connection.query(
+            passwordCheckQuery,
+            [email, password],
+            (err2, result2) => {
+              connection.release();
+
+              if (err2) throw err2;
+
+              if (result2.length > 0) {
+                // Login sukses
+                req.session.loggedin = true;
+                req.session.userid = result2[0].id;
+                req.session.username = result2[0].name;
+                res.redirect("/");
+              } else {
+                // Password salah
+                req.flash("color", "danger");
+                req.flash("status", "Gagal");
+                req.flash("message", "Password salah");
+                res.redirect("/login");
+              }
+            }
+          );
+        });
+      });
+    } else {
       req.flash("color", "warning");
       req.flash("status", "Perhatian");
-      req.flash("message", "Email dan password wajib diisi!");
-      return res.redirect("/login");
+      req.flash("message", "Email dan password wajib diisi");
+      res.redirect("/login");
     }
-
-    pool.getConnection((err, connection) => {
-      if (err) {
-        console.error("Koneksi DB gagal:", err);
-        req.flash("color", "danger");
-        req.flash("status", "Error");
-        req.flash("message", "Tidak dapat terhubung ke database.");
-        return res.redirect("/login");
-      }
-
-      // Query: cek email & password langsung
-      const sql = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
-      connection.query(sql, [email, pass], (err2, result) => {
-        connection.release();
-
-        if (err2) {
-          console.error("Query error:", err2);
-          req.flash("color", "danger");
-          req.flash("status", "Error");
-          req.flash("message", "Terjadi kesalahan saat login.");
-          return res.redirect("/login");
-        }
-
-        if (result.length === 0) {
-          req.flash("color", "danger");
-          req.flash("status", "Gagal");
-          req.flash("message", "Email atau password salah.");
-          return res.redirect("/login");
-        }
-
-        // ✅ Login berhasil
-        req.session.loggedin = true;
-        req.session.userid = result[0].user_id;
-        req.session.username = result[0].user_name;
-
-        console.log("Login berhasil. Session:", req.session);
-        return res.redirect("/");
-      });
-    });
   },
 
-  // GET /logout
   logout(req, res) {
     req.session.destroy((err) => {
       if (err) {
-        console.error("Gagal logout:", err);
+        console.error(err);
+        return;
       }
       res.clearCookie("secretname");
       res.redirect("/login");
