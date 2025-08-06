@@ -75,9 +75,12 @@ module.exports = {
 
           if (result2.length > 0) {
             // Login sukses
+            // Berhasil login
             req.session.loggedin = true;
-            req.session.userid = result2[0].id;
-            req.session.username = result2[0].user_name;
+            req.session.userid = results[0].user_id;
+            req.session.username = results[0].user_name;
+
+            console.log("Session setelah login:", req.session);
             res.redirect("/");
           } else {
             req.flash("color", "danger");
