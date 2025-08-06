@@ -23,71 +23,69 @@ module.exports = {
     const email = req.body.email;
     const password = req.body.pass;
 
-    if (email && password) {
-      pool.getConnection((err, connection) => {
-        if (err) {
-          console.error("DB connection error:", err);
-          req.flash("color", "danger");
-          req.flash("status", "Error");
-          req.flash("message", "Database tidak dapat diakses");
-          return res.redirect("/login");
-        }
-
-        const emailCheckQuery = `SELECT * FROM table_user WHERE email = ?`;
-        connection.query(emailCheckQuery, [email], (err, results) => {
-          if (err) {
-            connection.release();
-            console.error("Query error:", err);
-            req.flash("color", "danger");
-            req.flash("status", "Error");
-            req.flash("message", "Gagal mengambil data");
-            return res.redirect("/login");
-          }
-
-          if (results.length === 0) {
-            connection.release();
-            req.flash("color", "danger");
-            req.flash("status", "Gagal");
-            req.flash("message", "Email tidak terdaftar");
-            return res.redirect("/login");
-          }
-
-          const passwordCheckQuery = `SELECT * FROM table_user WHERE email = ? AND password = SHA2(?, 512)`;
-          connection.query(
-            passwordCheckQuery,
-            [email, password],
-            (err2, result2) => {
-              connection.release();
-
-              if (err2) {
-                console.error("Password check error:", err2);
-                req.flash("color", "danger");
-                req.flash("status", "Error");
-                req.flash("message", "Terjadi kesalahan saat verifikasi");
-                return res.redirect("/login");
-              }
-
-              if (result2.length > 0) {
-                req.session.loggedin = true;
-                req.session.userid = result2[0].id;
-                req.session.username = result2[0].name;
-                res.redirect("/");
-              } else {
-                req.flash("color", "danger");
-                req.flash("status", "Gagal");
-                req.flash("message", "Password salah");
-                res.redirect("/login");
-              }
-            }
-          );
-        });
-      });
-    } else {
+    if (!email || !password) {
       req.flash("color", "warning");
       req.flash("status", "Perhatian");
       req.flash("message", "Email dan password wajib diisi");
-      res.redirect("/login");
+      return res.redirect("/login");
     }
+
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.error("Koneksi DB gagal:", err);
+        req.flash("color", "danger");
+        req.flash("status", "Error");
+        req.flash("message", "Gagal terhubung ke database");
+        return res.redirect("/login");
+      }
+
+      const query = `SELECT * FROM table_admin WHERE user_email = ?`;
+      connection.query(query, [email], (err, results) => {
+        if (err) {
+          connection.release();
+          console.error("Query error:", err);
+          req.flash("color", "danger");
+          req.flash("status", "Error");
+          req.flash("message", "Terjadi kesalahan saat mengambil data");
+          return res.redirect("/login");
+        }
+
+        if (results.length === 0) {
+          connection.release();
+          req.flash("color", "danger");
+          req.flash("status", "Gagal");
+          req.flash("message", "Email tidak terdaftar");
+          return res.redirect("/login");
+        }
+
+        const user = results[0];
+
+        const passwordQuery = `SELECT * FROM table_admin WHERE user_email = ? AND user_password = SHA2(?, 512)`;
+        connection.query(passwordQuery, [email, password], (err2, result2) => {
+          connection.release();
+
+          if (err2) {
+            console.error("Query error (password):", err2);
+            req.flash("color", "danger");
+            req.flash("status", "Error");
+            req.flash("message", "Terjadi kesalahan saat verifikasi");
+            return res.redirect("/login");
+          }
+
+          if (result2.length > 0) {
+            req.session.loggedin = true;
+            req.session.userid = result2[0].id;
+            req.session.username = result2[0].name;
+            res.redirect("/");
+          } else {
+            req.flash("color", "danger");
+            req.flash("status", "Gagal");
+            req.flash("message", "Password salah");
+            res.redirect("/login");
+          }
+        });
+      });
+    });
   },
 
   logout(req, res) {
