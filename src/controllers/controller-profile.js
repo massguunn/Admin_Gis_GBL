@@ -8,9 +8,9 @@ pool.on("error", (err) => {
 
 module.exports = {
   profile(req, res) {
-    // Cek apakah user sudah login
+    console.log("Session user ID:", req.session.userid);
     if (!req.session.userid) {
-      console.log("Session user ID tidak ditemukan. Redirect ke login.");
+      console.log("Session kosong. Redirect ke login.");
       return res.redirect("/login");
     }
 
