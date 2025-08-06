@@ -20,39 +20,65 @@ module.exports = {
   },
   // Post / kirim data yang diinput user
   loginAuth(req, res) {
-    let email = req.body.email;
-    let password = req.body.pass;
+    const email = req.body.email;
+    const password = req.body.pass;
+
     if (email && password) {
-      pool.getConnection(function (err, connection) {
+      pool.getConnection((err, connection) => {
         if (err) throw err;
-        connection.query(
-          `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?,512)`,
-          [email, password],
-          function (error, results) {
-            if (error) throw error;
-            if (results.length > 0) {
-              // Jika data ditemukan, set sesi user tersebut menjadi true
-              req.session.loggedin = true;
-              req.session.userid = results[0].user_id;
-              req.session.username = results[0].user_name;
-              res.redirect("/");
-            } else {
-              // Jika data tidak ditemukan, set library flash dengan pesan error yang diinginkan
-              req.flash("color", "danger");
-              req.flash("status", "Oops..");
-              req.flash("message", "Akun tidak ditemukan");
-              res.redirect("/login");
-            }
+
+        // Langkah 1: cek apakah email terdaftar
+        const emailCheckQuery = `SELECT * FROM table_admin WHERE email = ?`;
+        connection.query(emailCheckQuery, [email], (err, results) => {
+          if (err) {
+            connection.release();
+            throw err;
           }
-        );
-        connection.release();
+
+          if (results.length === 0) {
+            // Email tidak terdaftar
+            connection.release();
+            req.flash("color", "danger");
+            req.flash("status", "Gagal");
+            req.flash("message", "Email tidak terdaftar");
+            return res.redirect("/login");
+          }
+
+          // Langkah 2: cek apakah password cocok
+          const passwordCheckQuery = `SELECT * FROM table_admin WHERE email = ? AND password = SHA2(?, 512)`;
+          connection.query(
+            passwordCheckQuery,
+            [email, password],
+            (err2, result2) => {
+              connection.release();
+
+              if (err2) throw err2;
+
+              if (result2.length > 0) {
+                // Login sukses
+                req.session.loggedin = true;
+                req.session.userid = result2[0].id;
+                req.session.username = result2[0].name;
+                res.redirect("/");
+              } else {
+                // Password salah
+                req.flash("color", "danger");
+                req.flash("status", "Gagal");
+                req.flash("message", "Password salah");
+                res.redirect("/login");
+              }
+            }
+          );
+        });
       });
     } else {
+      req.flash("color", "warning");
+      req.flash("status", "Perhatian");
+      req.flash("message", "Email dan password wajib diisi");
       res.redirect("/login");
-      res.end();
     }
   },
-  // Fungsi untuk logout | Cara memanggilnya menggunakan url/rute 'http://localhost:5050/login/logout'
+
   logout(req, res) {
     // Hapus sesi user dari broser
     req.session.destroy((err) => {
