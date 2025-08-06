@@ -1,32 +1,32 @@
 const config = require("../configs/database");
-
-let mysql = require("mysql");
-let pool = mysql.createPool(config);
+const mysql = require("mysql");
+const pool = mysql.createPool(config);
 
 pool.on("error", (err) => {
-  console.error(err);
+  console.error("Database error:", err);
 });
 
 module.exports = {
+  // GET /login
   login(req, res) {
     const fullUrl = req.protocol + "://" + req.get("host") + "/";
 
     res.render("login", {
-      url: fullUrl, // sekarang sudah didefinisikan
-      colorFlash: req.flash("color"),
-      statusFlash: req.flash("status"),
-      pesanFlash: req.flash("message"),
+      url: fullUrl,
+      colorFlash: req.flash("color") || null,
+      statusFlash: req.flash("status") || null,
+      pesanFlash: req.flash("message") || null,
     });
   },
-  // Post / kirim data yang diinput user
-  loginAuth(req, res) {
-    const email = req.body.email;
-    const password = req.body.pass;
 
-    if (!email || !password) {
+  // POST /login
+  loginAuth(req, res) {
+    const { email, pass } = req.body;
+
+    if (!email || !pass) {
       req.flash("color", "warning");
       req.flash("status", "Perhatian");
-      req.flash("message", "Email dan password wajib diisi");
+      req.flash("message", "Email dan password wajib diisi!");
       return res.redirect("/login");
     }
 
@@ -35,66 +35,68 @@ module.exports = {
         console.error("Koneksi DB gagal:", err);
         req.flash("color", "danger");
         req.flash("status", "Error");
-        req.flash("message", "Gagal terhubung ke database");
+        req.flash("message", "Tidak dapat terhubung ke database.");
         return res.redirect("/login");
       }
 
-      const query = `SELECT * FROM table_user WHERE user_email = ?`;
-      connection.query(query, [email], (err, results) => {
+      // Cek user berdasarkan email
+      const sqlEmail = `SELECT * FROM table_user WHERE user_email = ?`;
+      connection.query(sqlEmail, [email], (err, userResult) => {
         if (err) {
           connection.release();
-          console.error("Query error:", err);
+          console.error("Query email error:", err);
           req.flash("color", "danger");
           req.flash("status", "Error");
-          req.flash("message", "Terjadi kesalahan saat mengambil data");
+          req.flash("message", "Terjadi kesalahan saat mengambil data.");
           return res.redirect("/login");
         }
 
-        if (results.length === 0) {
+        if (userResult.length === 0) {
           connection.release();
           req.flash("color", "danger");
           req.flash("status", "Gagal");
-          req.flash("message", "Email tidak terdaftar");
+          req.flash("message", "Email tidak terdaftar.");
           return res.redirect("/login");
         }
 
-        const user = results[0];
-
-        const passwordQuery = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
-        connection.query(passwordQuery, [email, password], (err2, result2) => {
+        // Cek password
+        const sqlPassword = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
+        connection.query(sqlPassword, [email, pass], (err2, result2) => {
           connection.release();
 
           if (err2) {
-            console.error("Query error (password):", err2);
+            console.error("Query password error:", err2);
             req.flash("color", "danger");
             req.flash("status", "Error");
-            req.flash("message", "Terjadi kesalahan saat verifikasi");
+            req.flash("message", "Terjadi kesalahan saat verifikasi password.");
             return res.redirect("/login");
           }
 
           if (result2.length > 0) {
+            // Login sukses
             req.session.loggedin = true;
-            req.session.userid = result2[0].id;
-            req.session.username = result2[0].name;
-            res.redirect("/");
+            req.session.userid = results[0].user_id;
+            req.session.username = results[0].user_name;
+
+            console.log("Session setelah login:", req.session);
+            return res.redirect("/");
           } else {
-            req.flash("color", "danger");
+            req.flash("color", "error"); // SweetAlert icon
             req.flash("status", "Gagal");
             req.flash("message", "Password salah");
-            res.redirect("/login");
+            return res.redirect("/login");
           }
         });
       });
     });
   },
 
+  // GET /logout
   logout(req, res) {
-    // Hapus sesi user dari broser
     req.session.destroy((err) => {
       if (err) {
-        return console.log(err);
+        console.error("Gagal logout:", err);
       }
-      // Hapus cokie yang masih tertinggal
       res.clearCookie("secretname");
       res.redirect("/login");
     });

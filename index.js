@@ -34,7 +34,7 @@ app.use(
     name: "secretName",
     cookie: {
       httpOnly: true,
-      secure: false, // set true jika pakai HTTPS
+      secure: true, // set true jika pakai HTTPS
       sameSite: "lax", // atau 'strict' tergantung kebutuhan
       maxAge: 1000 * 60 * 60, // 1 jam
     },
@@ -42,6 +42,14 @@ app.use(
 );
 
 app.use(flash());
+
+// Middleware global untuk akses flash dari semua EJS
+app.use((req, res, next) => {
+  res.locals.colorFlash = req.flash("color");
+  res.locals.statusFlash = req.flash("status");
+  res.locals.pesanFlash = req.flash("message");
+  next();
+});
 
 // Setting folder views
 app.set("views", path.join(__dirname, "src/views"));
