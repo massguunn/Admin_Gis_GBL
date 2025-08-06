@@ -18,6 +18,8 @@ module.exports = {
       return res.redirect("/login");
     }
 
+    console.log("Session user id:", req.session.userid);
+
     pool.getConnection((err, connection) => {
       if (err) {
         console.error("Database connection failed:", err);
