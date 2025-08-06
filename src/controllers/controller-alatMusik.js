@@ -19,8 +19,8 @@ module.exports = {
         colorFlash: req.flash("color"),
         statusFlash: req.flash("status"),
         pesanFlash: req.flash("message"),
-        swalMessage: req.flash("swal_message"),
-        swalIcon: req.flash("swal_icon"),
+        swalMessage: req.flash("message") || [],
+        swalIcon: req.flash("color") || [], // success | error | info | warning
       });
     });
   },

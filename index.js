@@ -3,7 +3,7 @@ const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const path = require("path");
-const flash = require("req-flash");
+const flash = require("connect-flash");
 const app = express();
 const methodOverride = require("method-override");
 

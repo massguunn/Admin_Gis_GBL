@@ -401,19 +401,20 @@
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </div>
 
-    <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <% if (swalMessage.length > 0 && swalIcon.length > 0) { %>
+    <% if (typeof swalMessage !== "undefined" && swalMessage.length > 0 &&
+    typeof swalIcon !== "undefined" && swalIcon.length > 0) { %>
     <script>
       Swal.fire({
         icon: "<%= swalIcon[0] %>", // success | info | warning | error
-        title: "<%= swalMessage[0] %>",
-        toast: true,
-        position: "top",
+        title:
+          "<%= swalIcon[0] === 'success' ? 'Berhasil!' : swalIcon[0] === 'error' ? 'Gagal!' : 'Info' %>",
+        text: "<%= swalMessage[0] %>",
+        timer: 3000,
         showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
+        toast: true,
+        position: "top-end",
       });
     </script>
     <% } %>
