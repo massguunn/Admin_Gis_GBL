@@ -1,5 +1,4 @@
 const config = require("../configs/database");
-
 let mysql = require("mysql");
 let pool = mysql.createPool(config);
 
@@ -8,17 +7,19 @@ pool.on("error", (err) => {
 });
 
 module.exports = {
+  // GET /login
   login(req, res) {
     const fullUrl = req.protocol + "://" + req.get("host") + "/";
 
     res.render("login", {
-      url: fullUrl, // sekarang sudah didefinisikan
+      url: fullUrl,
       colorFlash: req.flash("color"),
       statusFlash: req.flash("status"),
       pesanFlash: req.flash("message"),
     });
   },
-  // Post / kirim data yang diinput user
+
+  // POST /login
   loginAuth(req, res) {
     const email = req.body.email;
     const password = req.body.pass;
@@ -39,8 +40,9 @@ module.exports = {
         return res.redirect("/login");
       }
 
-      const query = `SELECT * FROM table_user WHERE user_email = ?`;
-      connection.query(query, [email], (err, results) => {
+      // Langkah 1: Cek apakah email ada
+      const checkEmail = `SELECT * FROM table_user WHERE user_email = ?`;
+      connection.query(checkEmail, [email], (err, results) => {
         if (err) {
           connection.release();
           console.error("Query error:", err);
@@ -58,10 +60,9 @@ module.exports = {
           return res.redirect("/login");
         }
 
-        const user = results[0];
-
-        const passwordQuery = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
-        connection.query(passwordQuery, [email, password], (err2, result2) => {
+        // Langkah 2: Cek password
+        const checkPassword = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
+        connection.query(checkPassword, [email, password], (err2, result2) => {
           connection.release();
 
           if (err2) {
@@ -73,9 +74,10 @@ module.exports = {
           }
 
           if (result2.length > 0) {
+            // Login sukses
             req.session.loggedin = true;
             req.session.userid = result2[0].id;
-            req.session.username = result2[0].name;
+            req.session.username = result2[0].user_name;
             res.redirect("/");
           } else {
             req.flash("color", "danger");
@@ -88,13 +90,12 @@ module.exports = {
     });
   },
 
+  // GET /logout
   logout(req, res) {
-    // Hapus sesi user dari broser
     req.session.destroy((err) => {
       if (err) {
         return console.log(err);
       }
-      // Hapus cokie yang masih tertinggal
       res.clearCookie("secretname");
       res.redirect("/login");
     });
