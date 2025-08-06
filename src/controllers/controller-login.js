@@ -28,7 +28,7 @@ module.exports = {
         if (err) throw err;
 
         // Langkah 1: cek apakah email terdaftar
-        const emailCheckQuery = `SELECT * FROM table_admin WHERE email = ?`;
+        const emailCheckQuery = `SELECT * FROM table_user WHERE email = ?`;
         connection.query(emailCheckQuery, [email], (err, results) => {
           if (err) {
             connection.release();
@@ -45,7 +45,7 @@ module.exports = {
           }
 
           // Langkah 2: cek apakah password cocok
-          const passwordCheckQuery = `SELECT * FROM table_admin WHERE email = ? AND password = SHA2(?, 512)`;
+          const passwordCheckQuery = `SELECT * FROM table_user WHERE email = ? AND password = SHA2(?, 512)`;
           connection.query(
             passwordCheckQuery,
             [email, password],
