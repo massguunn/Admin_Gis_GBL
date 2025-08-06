@@ -123,13 +123,19 @@
       });
     </script>
 
+    <!-- SweetAlert CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <% if (colorFlash && statusFlash && pesanFlash) { %>
     <script>
       Swal.fire({
-        icon: "<%= colorFlash %>", // success, error, warning, info
+        icon: "<%= colorFlash %>", // success | warning | error
         title: "<%= statusFlash %>",
         text: "<%= pesanFlash %>",
-        confirmButtonText: "OK",
+        timer: 3000,
+        showConfirmButton: false,
+        position: "top",
+        toast: true,
       });
     </script>
     <% } %>
