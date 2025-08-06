@@ -1,21 +1,21 @@
-require("dotenv").config();
 const config = require("../configs/database");
-
 const mysql = require("mysql");
 const pool = mysql.createPool(config);
 
-pool.on("error", (err) => console.error(err));
+pool.on("error", (err) => {
+  console.error("Database error:", err);
+});
 
 module.exports = {
+  // GET /login
   login(req, res) {
-    const baseUrl =
-      process.env.BASE_URL || req.protocol + "://" + req.get("host") + "/";
+    const fullUrl = req.protocol + "://" + req.get("host") + "/";
 
     res.render("login", {
-      url: baseUrl, // dari .env
-      colorFlash: req.flash("color"),
-      statusFlash: req.flash("status"),
-      pesanFlash: req.flash("message"),
+      url: fullUrl,
+      colorFlash: req.flash("color") || null,
+      statusFlash: req.flash("status") || null,
+      pesanFlash: req.flash("message") || null,
     });
   },
 
@@ -36,7 +36,6 @@ module.exports = {
           }
 
           if (results.length === 0) {
-            // Email tidak terdaftar
             connection.release();
             req.flash("color", "danger");
             req.flash("status", "Gagal");
