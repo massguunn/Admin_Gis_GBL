@@ -122,5 +122,16 @@
         setDarkMode(isDark);
       });
     </script>
+
+    <% if (colorFlash && statusFlash && pesanFlash) { %>
+    <script>
+      Swal.fire({
+        icon: "<%= colorFlash %>", // success, error, warning, info
+        title: "<%= statusFlash %>",
+        text: "<%= pesanFlash %>",
+        confirmButtonText: "OK",
+      });
+    </script>
+    <% } %>
   </body>
 </html>
