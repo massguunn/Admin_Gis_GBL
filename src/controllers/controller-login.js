@@ -39,7 +39,6 @@ module.exports = {
         return res.redirect("/login");
       }
 
-      // Cek user berdasarkan email
       const sqlEmail = `SELECT * FROM table_user WHERE user_email = ?`;
       connection.query(sqlEmail, [email], (err, userResult) => {
         if (err) {
@@ -59,7 +58,6 @@ module.exports = {
           return res.redirect("/login");
         }
 
-        // Cek password
         const sqlPassword = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
         connection.query(sqlPassword, [email, pass], (err2, result2) => {
           connection.release();
@@ -73,15 +71,15 @@ module.exports = {
           }
 
           if (result2.length > 0) {
-            // Login sukses
+            // ✅ Sukses login
             req.session.loggedin = true;
-            req.session.userid = results[0].user_id;
-            req.session.username = results[0].user_name;
+            req.session.userid = result2[0].user_id;
+            req.session.username = result2[0].user_name;
 
             console.log("Session setelah login:", req.session);
             return res.redirect("/");
           } else {
-            req.flash("color", "error"); // SweetAlert icon
+            req.flash("color", "error");
             req.flash("status", "Gagal");
             req.flash("message", "Password salah");
             return res.redirect("/login");
