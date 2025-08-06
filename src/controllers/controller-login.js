@@ -39,52 +39,33 @@ module.exports = {
         return res.redirect("/login");
       }
 
-      const sqlEmail = `SELECT * FROM table_user WHERE user_email = ?`;
-      connection.query(sqlEmail, [email], (err, userResult) => {
-        if (err) {
-          connection.release();
-          console.error("Query email error:", err);
+      // Query: cek email & password langsung
+      const sql = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
+      connection.query(sql, [email, pass], (err2, result) => {
+        connection.release();
+
+        if (err2) {
+          console.error("Query error:", err2);
           req.flash("color", "danger");
           req.flash("status", "Error");
-          req.flash("message", "Terjadi kesalahan saat mengambil data.");
+          req.flash("message", "Terjadi kesalahan saat login.");
           return res.redirect("/login");
         }
 
-        if (userResult.length === 0) {
-          connection.release();
+        if (result.length === 0) {
           req.flash("color", "danger");
           req.flash("status", "Gagal");
-          req.flash("message", "Email tidak terdaftar.");
+          req.flash("message", "Email atau password salah.");
           return res.redirect("/login");
         }
 
-        const sqlPassword = `SELECT * FROM table_user WHERE user_email = ? AND user_password = SHA2(?, 512)`;
-        connection.query(sqlPassword, [email, pass], (err2, result2) => {
-          connection.release();
+        // ✅ Login berhasil
+        req.session.loggedin = true;
+        req.session.userid = result[0].user_id;
+        req.session.username = result[0].user_name;
 
-          if (err2) {
-            console.error("Query password error:", err2);
-            req.flash("color", "danger");
-            req.flash("status", "Error");
-            req.flash("message", "Terjadi kesalahan saat verifikasi password.");
-            return res.redirect("/login");
-          }
-
-          if (result2.length > 0) {
-            // ✅ Sukses login
-            req.session.loggedin = true;
-            req.session.userid = result2[0].user_id;
-            req.session.username = result2[0].user_name;
-
-            console.log("Session setelah login:", req.session);
-            return res.redirect("/");
-          } else {
-            req.flash("color", "error");
-            req.flash("status", "Gagal");
-            req.flash("message", "Password salah");
-            return res.redirect("/login");
-          }
-        });
+        console.log("Login berhasil. Session:", req.session);
+        return res.redirect("/");
       });
     });
   },
