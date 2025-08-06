@@ -33,8 +33,10 @@ app.use(
     secret: "t@1k0ch3ng",
     name: "secretName",
     cookie: {
-      sameSite: true,
-      maxAge: 600000,
+      httpOnly: true,
+      secure: false, // set true jika pakai HTTPS
+      sameSite: "lax", // atau 'strict' tergantung kebutuhan
+      maxAge: 1000 * 60 * 60, // 1 jam
     },
   })
 );
