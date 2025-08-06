@@ -1,54 +1,71 @@
-// Definisikan configurasi Database
 const config = require("../configs/database");
-// Gunakan library mysql
 let mysql = require("mysql");
-// Buat koneksi
 let pool = mysql.createPool(config);
 
-// Kirim error jika koneksi gagal
+// Handle error dari koneksi pool
 pool.on("error", (err) => {
-  console.error(err);
+  console.error("Database error:", err);
 });
 
 module.exports = {
-  // Fungsi untuk merender file register yang ada pada folder 'src/views/register.ejs'
+  // Tampilkan halaman register
   formRegister(req, res) {
+    const fullUrl = req.protocol + "://" + req.get("host") + "/";
     res.render("register", {
-      // Definisikan semua varibel yang ingin ikut dirender kedalam register.ejs
-      url: "http://localhost:3000/",
+      url: fullUrl, // untuk digunakan di register.ejs jika perlu
+      colorFlash: req.flash("color"),
+      statusFlash: req.flash("status"),
+      pesanFlash: req.flash("message"),
     });
   },
-  // Fungsi untuk menyimpan data
+
+  // Simpan data register
   saveRegister(req, res) {
-    // Tampung inputan user kedalam varibel username, email dan password
-    let username = req.body.username;
-    let email = req.body.email;
-    let password = req.body.pass;
-    // Pastikan semua varibel terisi
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.pass;
+
     if (username && email && password) {
-      // Panggil koneksi dan eksekusi query
-      pool.getConnection(function (err, connection) {
-        if (err) throw err;
+      pool.getConnection((err, connection) => {
+        if (err) {
+          console.error("Koneksi DB gagal:", err);
+          req.flash("color", "danger");
+          req.flash("status", "Gagal");
+          req.flash("message", "Koneksi ke database gagal");
+          return res.redirect("/register");
+        }
+
+        const insertQuery = `INSERT INTO table_user (user_name, user_email, user_password) VALUES (?, ?, SHA2(?, 512))`;
+
         connection.query(
-          `INSERT INTO table_user (user_name,user_email,user_password) VALUES (?,?,SHA2(?,512));`,
+          insertQuery,
           [username, email, password],
-          function (error, results) {
-            if (error) throw error;
-            // Jika tidak ada error, set library flash untuk menampilkan pesan sukses
+          (error, results) => {
+            connection.release();
+
+            if (error) {
+              console.error("Query error:", error);
+              req.flash("color", "danger");
+              req.flash("status", "Gagal");
+              req.flash(
+                "message",
+                "Gagal mendaftarkan user. Mungkin email sudah terdaftar."
+              );
+              return res.redirect("/register");
+            }
+
             req.flash("color", "success");
             req.flash("status", "Yes..");
             req.flash("message", "Registrasi berhasil");
-            // Kembali kehalaman login
             res.redirect("/login");
           }
         );
-        // Koneksi selesai
-        connection.release();
       });
     } else {
-      // Kondisi apabila variabel username, email dan password tidak terisi
-      res.redirect("/login");
-      res.end();
+      req.flash("color", "warning");
+      req.flash("status", "Perhatian");
+      req.flash("message", "Semua field wajib diisi");
+      res.redirect("/register");
     }
   },
 };
